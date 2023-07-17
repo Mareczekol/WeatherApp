@@ -8,7 +8,6 @@ def get_weather_forecast(latitude, longitude, date):
     # Format the date
     formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
-
     # Build the API URL
     url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&" \
           f"longitude={longitude}&hourly=rain&daily=rain_sum&timezone=" \
@@ -26,11 +25,13 @@ def get_weather_forecast(latitude, longitude, date):
         # Extract the rainfall value from the response
         rainfall = data["daily"]["rain_sum"][0]
 
-        # Determine the weather condition based on the rainfall value
-        if rainfall > 0.0:
-            return "Będzie padać"
-        elif rainfall == 0.0:
-            return "Nie będzie padać"
+        # Check if rainfall is not None
+        if rainfall is not None:
+            # Determine the weather condition based on the rainfall value
+            if rainfall > 0.0:
+                return "Będzie padać"
+            elif rainfall == 0.0:
+                return "Nie będzie padać"
         else:
             return "Nie wiem"
     else:
@@ -60,6 +61,25 @@ def check_weather():
         today = datetime.now().date()
         date = (today + timedelta(days=1)).strftime("%Y-%m-%d")
 
+    # Extract the latitude and longitude coordinates from the response
+    latitude = 0
+    longitude = 0
+
+    while not latitude:
+        latitude_input = input("Podaj szerokość geograficzną: ")
+        if latitude_input.replace(".", "", 1).isdigit():
+            latitude = latitude_input
+        else:
+            print("Podaj właściwą szerokość geograficzną!")
+            continue
+    while not longitude:
+        longitude_input = input("Podaj długość geograficzną: ")
+        if longitude_input.replace(".", "", 1).isdigit():
+            longitude = longitude_input
+        else:
+            print("Podaj właściwą długość geograficzną!")
+            continue
+
     # Check if the weather data for the date is already saved in the file
     with open("weather_data.txt", "r") as file:
         for line in file:
@@ -68,11 +88,6 @@ def check_weather():
                 # condition from the file
                 weather_condition = line.split(":")[1].strip()
                 return weather_condition
-
-    # If the weather data is not saved, retrieve it from the API
-    latitude = input("Podaj szerokość geograficzną: ")
-    longitude = input("Podaj długość geograficzną: ")
-
 
     weather_condition = get_weather_forecast(latitude, longitude, date)
 
