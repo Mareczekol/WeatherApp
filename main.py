@@ -8,6 +8,7 @@ def get_weather_forecast(latitude, longitude, date):
     # Format the date
     formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
+
     # Build the API URL
     url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&" \
           f"longitude={longitude}&hourly=rain&daily=rain_sum&timezone=" \
@@ -47,9 +48,13 @@ def check_weather():
     # Ask the user for the date
     date_input = input("Podaj datę (YYYY-mm-dd): ")
 
-    # Check if a date was provided
     if date_input:
-        date = date_input
+        try:
+            date = datetime.strptime(date_input, "%Y-%m-%d").strftime(
+                "%Y-%m-%d")
+        except ValueError:
+            print("Podaj właściwą datę!")
+            return check_weather()
     else:
         # If no date was provided, use the next day's date
         today = datetime.now().date()
@@ -67,6 +72,7 @@ def check_weather():
     # If the weather data is not saved, retrieve it from the API
     latitude = input("Podaj szerokość geograficzną: ")
     longitude = input("Podaj długość geograficzną: ")
+
 
     weather_condition = get_weather_forecast(latitude, longitude, date)
 
